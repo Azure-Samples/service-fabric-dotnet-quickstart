@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="VotingApp" xmlns:ng="http://angularjs.org">
+<head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+    <!-- Stylesheets -->
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Application title and icons -->
+    <title>Voting Service Lab Sample</title>
+
+    <!-- IE Fix for HTML5 Tags -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+</head>
+<body ng-controller="VotingAppController">
+    <div class="container-fluid">
+        <h1>Votes</h1>
+        <div>
+            Add new voting item <input id="txtAdd" type="text" class="form-control" placeholder="Enter new voting term" ng-model="item" />
+            <button id="btnAdd" class="btn btn-primary" ng-click="add(item)">Add</button>
+        </div>
+        <br />
+        <table class="table table-striped table-condensed table-hover">
+            <thead>
+                <tr>
+                    <td>Voting Item</td>
+                    <td>Count</td>
+                    <td><button id="btnRefresh" class="btn btn-primary" ng-click="refresh()">Refresh</button></td>
+                </tr>
+            </thead>
+            <tr ng-repeat="vote in votes">
+                <td><button class="btn btn-primary" ng-click="add(vote.Key)">{{vote.Key}}</button></td>
+                <td>{{vote.Value}}</td>
+                <td><button class="btn btn-default" ng-click="remove(vote.Key)">Remove</button></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 3rd party libraries -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-route.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-cookies.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-sanitize.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.1/ui-bootstrap-tpls.js"></script>
+
+    <!-- Load application main script -->
+    <script>
+        var app = angular.module('VotingApp', ['ui.bootstrap']);
+        app.run(function () { });
+
+        app.controller('VotingAppController', ['$rootScope', '$scope', '$http', '$timeout', function ($rootScope, $scope, $http, $timeout) {
+
+            $scope.refresh = function() {
+                $http.get('../api/votes')
+                    .success(function (data, status) {
+                        $scope.votes = data;
+                    })
+                    .error(function (data, status) {
+                        $scope.votes = undefined;
+                    });
+            };
+
+            $scope.remove = function (item) {
+                $http.delete('../api/' + item)
+                    .success(function (data, status) {
+                        $scope.refresh();
+                    })
+            };
+
+            $scope.add = function (item) {
+                var fd = new FormData();
+                fd.append('item', item);
+                $http.post('../api/' + item, fd, {
+                    transformRequest: angular.identity,
+                    headers: { 'Content-Type' : undefined }
+                })
+                .success(function(data, status)
+                {
+                    $scope.refresh();
+                    $scope.item = undefined;
+                })
+            };
+        }]);
+    </script>
+</body>
+</html>
