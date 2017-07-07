@@ -30,7 +30,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VotingStateService\VotingStateService.csproj" />
+    <ProjectReference Include="..\VotingData\VotingData.csproj" />
     <ProjectReference Include="..\VotingWeb\VotingWeb.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />

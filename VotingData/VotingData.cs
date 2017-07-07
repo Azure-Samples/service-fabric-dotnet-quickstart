@@ -10,16 +10,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using System.Net.Http;
+using Microsoft.ServiceFabric.Data;
 
-namespace VotingWeb
+namespace VotingData
 {
     /// <summary>
     /// The FabricRuntime creates an instance of this class for each service type instance. 
     /// </summary>
-    internal sealed class VotingWeb : StatelessService
+    internal sealed class VotingData : StatefulService
     {
-        public VotingWeb(StatelessServiceContext context)
+        public VotingData(StatefulServiceContext context)
             : base(context)
         { }
 
@@ -27,24 +27,25 @@ namespace VotingWeb
         /// Optional override to create listeners (like tcp, http) for this service instance.
         /// </summary>
         /// <returns>The collection of listeners.</returns>
-        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceInstanceListener[]
+            return new ServiceReplicaListener[]
             {
-                new ServiceInstanceListener(serviceContext =>
-                    new WebListenerCommunicationListener(serviceContext, "ServiceEndpoint", (url, listener) =>
+                new ServiceReplicaListener(serviceContext =>
+                    new KestrelCommunicationListener(serviceContext, (url, listener) =>
                     {
-                        ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting WebListener on {url}");
+                        ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
 
-                        return new WebHostBuilder().UseWebListener()
+                        return new WebHostBuilder()
+                                    .UseKestrel()
                                     .ConfigureServices(
                                         services => services
-                                            .AddSingleton<StatelessServiceContext>(serviceContext)
-                                            .AddSingleton<HttpClient>())
+                                            .AddSingleton<StatefulServiceContext>(serviceContext)
+                                            .AddSingleton<IReliableStateManager>(this.StateManager))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
                                     .UseApplicationInsights()
-                                    .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
+                                    .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
                                     .UseUrls(url)
                                     .Build();
                     }))

@@ -22,7 +22,7 @@ app.controller('VotingAppController', ['$rootScope', '$scope', '$http', '$timeou
     $scope.add = function (item) {
         var fd = new FormData();
         fd.append('item', item);
-        $http.post('api/Votes/' + item, fd, {
+        $http.put('api/Votes/' + item, fd, {
             transformRequest: angular.identity,
             headers: { 'Content-Type': undefined }
         })

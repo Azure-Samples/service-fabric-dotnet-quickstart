@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using VotingStateService.Interfaces;
-using Microsoft.ServiceFabric.Services.Remoting.Client;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Text;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace VotingWeb.Controllers
 {
@@ -11,13 +13,17 @@ namespace VotingWeb.Controllers
     [Route("api/Votes")]
     public class VotesController : Controller
     {
-        private readonly IVotingStateService _stateService;
+        private readonly HttpClient httpClient;
+        private readonly string serviceProxyUrl;
+        private readonly string partitionKind;
+        private readonly string partitionKey;
 
-        public VotesController()
+        public VotesController(HttpClient httpClient)
         {
-            _stateService = ServiceProxy.Create<IVotingStateService>(
-                new Uri("fabric:/Voting/VotingStateService"),
-                new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(0));
+            this.httpClient = httpClient;
+            serviceProxyUrl = "http://localhost:19081/Voting/VotingData/api/VoteData";
+            partitionKind = "Int64Range";
+            partitionKey = "0";
         }
 
         // GET: api/Votes
@@ -26,51 +32,49 @@ namespace VotingWeb.Controllers
         {
             IEnumerable<KeyValuePair<string, int>> votes;
 
-            try
+            HttpResponseMessage response = await this.httpClient.GetAsync($"{serviceProxyUrl}?PartitionKind={partitionKind}&PartitionKey={partitionKey}");
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                votes = await _stateService.GetVoteCountAsync();
+                return this.StatusCode((int)response.StatusCode);
             }
-            catch (Exception ex)
-            {
-                return new ContentResult() { Content = ex.Message, StatusCode = 500 };
-            }
+
+            votes = JsonConvert.DeserializeObject<List<KeyValuePair<string, int>>>(await response.Content.ReadAsStringAsync());
 
             return Json(votes);
         }
 
-        // POST: api/Votes/name
-        [HttpPost("{id}")]
-        public async Task<IActionResult> Post(string id)
+        // PUT: api/Votes/name
+        [HttpPut("{name}")]
+        public async Task<IActionResult> Put(string name)
         {
-            try
-            {
-                await _stateService.AddVoteAsync(id);
-            }
-            catch (Exception ex)
-            {
-                return new ContentResult() { Content = ex.Message, StatusCode = 500 };
-            }
+            string payload = $"{{ 'name' : '{name}' }}";
+            StringContent putContent = new StringContent(payload, Encoding.UTF8, "application/json");
+            putContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            return Json(id);
+            string proxyUrl = $"{serviceProxyUrl}/{name}?PartitionKind={partitionKind}&PartitionKey={partitionKey}";
+
+            HttpResponseMessage response = await this.httpClient.PutAsync(proxyUrl, putContent);
+
+            return new ContentResult()
+            {
+                StatusCode = (int)response.StatusCode,
+                Content = await response.Content.ReadAsStringAsync()
+            };
         }
 
         // DELETE: api/Votes/name
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        [HttpDelete("{name}")]
+        public async Task<IActionResult> Delete(string name)
         {
-            try
-            {
-                if (await _stateService.ClearVoteCountAsync(id))
-                {
-                    return Json(id);
-                }
+            HttpResponseMessage response = await this.httpClient.DeleteAsync($"{serviceProxyUrl}/{name}?PartitionKind={partitionKind}&PartitionKey={partitionKey}");
 
-                return new NotFoundObjectResult(id);
-            }
-            catch (Exception ex)
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                return new ContentResult() { Content = ex.Message, StatusCode = 500 };
+                return this.StatusCode((int)response.StatusCode);
             }
+
+            return new OkResult();
 
         }
     }
