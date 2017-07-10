@@ -4,7 +4,7 @@ app.run(function () { });
 app.controller('VotingAppController', ['$rootScope', '$scope', '$http', '$timeout', function ($rootScope, $scope, $http, $timeout) {
 
     $scope.refresh = function () {
-        $http.get('api/Votes')
+        $http.get('api/Votes?c=' + new Date().getTime())
             .then(function (data, status) {
                 $scope.votes = data;
             }, function (data, status) {
