@@ -14,16 +14,13 @@ namespace VotingWeb.Controllers
     public class VotesController : Controller
     {
         private readonly HttpClient httpClient;
-        private readonly string serviceProxyUrl;
-        private readonly string partitionKind;
-        private readonly string partitionKey;
+        string serviceProxyUrl = "http://localhost:19081/Voting/VotingData/api/VoteData";
+        string partitionKind = "Int64Range";
+        string partitionKey = "0";
 
         public VotesController(HttpClient httpClient)
         {
             this.httpClient = httpClient;
-            serviceProxyUrl = "http://localhost:19081/Voting/VotingData/api/VoteData";
-            partitionKind = "Int64Range";
-            partitionKey = "0";
         }
 
         // GET: api/Votes

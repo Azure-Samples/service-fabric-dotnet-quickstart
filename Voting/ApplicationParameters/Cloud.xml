@@ -4,6 +4,6 @@
     <Parameter Name="VotingData_PartitionCount" Value="1" />
     <Parameter Name="VotingData_MinReplicaSetSize" Value="3" />
     <Parameter Name="VotingData_TargetReplicaSetSize" Value="3" />
-    <Parameter Name="VotingWeb_InstanceCount" Value="-1" />
+    <Parameter Name="VotingWeb_InstanceCount" Value="1" />
   </Parameters>
 </Application>
