@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PublishProfile xmlns="http://schemas.microsoft.com/2015/05/fabrictools">
+<PublishProfile xmlns="http://schemas.microsoft.com/2015/05/fabrictools" DisableAutoDiffPackaging="true">
   <!-- ClusterConnectionParameters allows you to specify the PowerShell parameters to use when connecting to the Service Fabric cluster.
        Valid parameters are any that are accepted by the Connect-ServiceFabricCluster cmdlet.
        
@@ -20,10 +20,6 @@
                                     AzureActiveDirectory="true"
                                     ServerCertThumbprint="0123456789012345678901234567890123456789" />
   -->
-  <ClusterConnectionParameters ConnectionEndpoint="wintestcluster.westus.cloudapp.azure.com:19000" />
+  <ClusterConnectionParameters />
   <ApplicationParameterFile Path="..\ApplicationParameters\Cloud.xml" />
-  <CopyPackageParameters CompressPackage="true"/>
-  <UpgradeDeployment Mode="Monitored" Enabled="false">
-    <Parameters FailureAction="Rollback" Force="True" />
-  </UpgradeDeployment>
 </PublishProfile>
