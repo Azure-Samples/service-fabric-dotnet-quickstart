@@ -8,7 +8,9 @@ check_errs()
   fi
 }
 
+LogFile="/tmp/VotingData-`date '+%Y.%m.%d-%H.%M.%S'`.log"
 DIR=`dirname $0`
+echo $DIR >$LogFile
 echo 0x3f > /proc/self/coredump_filter
-dotnet $DIR/VotingData.dll $@ >"/tmp/VotingData-`date '+%Y.%m.%d-%H.%M.%S'`.log" 2>&1
+dotnet $DIR/VotingData.dll $@ >$LogFile 2>&1
 check_errs $?
