@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace VotingData
     {
         public Startup(IHostingEnvironment env)
         {
+            Console.WriteLine("Entering Startup");
             string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             string appsettingsFileFullPath = Path.Combine(rootDir, "appsettings.json");
             string appsettingsEnvFileFullPath = Path.Combine(rootDir, $"appsettings.{env.EnvironmentName}.json");
@@ -25,6 +27,7 @@ namespace VotingData
                 .AddJsonFile(appsettingsEnvFileFullPath, optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+            Console.WriteLine("Completed Startup");
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -32,17 +35,21 @@ namespace VotingData
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Console.WriteLine("Entering ConfigureServices");
             // Add framework services.
             services.AddMvc();
+            Console.WriteLine("Completed ConfigureServices");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            Console.WriteLine("Entering Configure");
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
             app.UseMvc();
+            Console.WriteLine("Completed Configure");
         }
     }
 }
