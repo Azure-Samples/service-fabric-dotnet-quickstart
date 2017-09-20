@@ -16,18 +16,26 @@ namespace VotingData
     {
         public Startup(IHostingEnvironment env)
         {
-            Console.WriteLine("Entering Startup");
-            string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string appsettingsFileFullPath = Path.Combine(rootDir, "appsettings.json");
-            string appsettingsEnvFileFullPath = Path.Combine(rootDir, $"appsettings.{env.EnvironmentName}.json");
+            try
+            {
+                Console.WriteLine("Entering Startup");
+                string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                string appsettingsFileFullPath = Path.Combine(rootDir, "appsettings.json");
+                string appsettingsEnvFileFullPath = Path.Combine(rootDir, $"appsettings.{env.EnvironmentName}.json");
 
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile(appsettingsFileFullPath, optional: false, reloadOnChange: true)
-                .AddJsonFile(appsettingsEnvFileFullPath, optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
-            Console.WriteLine("Completed Startup");
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(env.ContentRootPath)
+                    .AddJsonFile(appsettingsFileFullPath, optional: false, reloadOnChange: true)
+                    .AddJsonFile(appsettingsEnvFileFullPath, optional: true)
+                    .AddEnvironmentVariables();
+                Configuration = builder.Build();
+                Console.WriteLine("Completed Startup");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Startup failed with Exception: {0}", e);
+                throw;
+            }
         }
 
         public IConfigurationRoot Configuration { get; }
