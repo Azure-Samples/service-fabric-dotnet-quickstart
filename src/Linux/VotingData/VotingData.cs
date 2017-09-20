@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
+using System.Reflection;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace VotingData
                     new KestrelCommunicationListener(serviceContext, (url, listener) =>
                     {
                         //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
+                        string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
                         return new WebHostBuilder()
                                     .UseKestrel()
@@ -42,7 +44,7 @@ namespace VotingData
                                         services => services
                                             .AddSingleton<StatelessServiceContext>(serviceContext)
                                             .AddSingleton<IReliableStateManager>(new Mocks.MockReliableStateManager()))
-                                    .UseContentRoot(Directory.GetCurrentDirectory())
+                                    .UseContentRoot(rootDir)
                                     .UseStartup<Startup>()
                                     .UseApplicationInsights()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)

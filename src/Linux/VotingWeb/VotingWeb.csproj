@@ -11,12 +11,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="6.1.166-preview" />
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Abstractions" Version="3.0.166-preview" />
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.0.166-preview" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="3.0.166-preview" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.166-preview" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.0.166-preview" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.1.167-preview" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Abstractions" Version="3.0.167-preview" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.0.167-preview" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="3.0.167-preview" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.167-preview" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.0.167-preview" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
   </ItemGroup>
