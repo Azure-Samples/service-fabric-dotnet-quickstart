@@ -35,21 +35,30 @@ namespace VotingData
                 new ServiceInstanceListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, (url, listener) =>
                     {
-                        //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
-                        string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                        try
+                        {
+                            Console.WriteLine("building WebHostBuilder");
+                            //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
+                            string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-                        return new WebHostBuilder()
-                                    .UseKestrel()
-                                    .ConfigureServices(
-                                        services => services
-                                            .AddSingleton<StatelessServiceContext>(serviceContext)
-                                            .AddSingleton<IReliableStateManager>(new Mocks.MockReliableStateManager()))
-                                    .UseContentRoot(rootDir)
-                                    .UseStartup<Startup>()
-                                    .UseApplicationInsights()
-                                    .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
-                                    .UseUrls(url)
-                                    .Build();
+                            return new WebHostBuilder()
+                                        .UseKestrel()
+                                        .ConfigureServices(
+                                            services => services
+                                                .AddSingleton<StatelessServiceContext>(serviceContext)
+                                                .AddSingleton<IReliableStateManager>(new Mocks.MockReliableStateManager()))
+                                        .UseContentRoot(rootDir)
+                                        .UseStartup<Startup>()
+                                        .UseApplicationInsights()
+                                        .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
+                                        .UseUrls(url)
+                                        .Build();
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine("Web HostBuilder exception: {0}", ex);
+                            throw;
+                        }
                     }))
             };
         }

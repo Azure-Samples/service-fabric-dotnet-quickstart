@@ -35,20 +35,29 @@ namespace VotingWeb
                 new ServiceInstanceListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, "ServiceEndpoint", (url, listener) =>
                     {
-                        //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting WebListener on {url}");
-                        string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                        try
+                        {
+                            Console.WriteLine("building WebHostBuilder");
+                            //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting WebListener on {url}");
+                            string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-                        return new WebHostBuilder().UseKestrel()
-                                    .ConfigureServices(
-                                        services => services
-                                            .AddSingleton<StatelessServiceContext>(serviceContext)
-                                            .AddSingleton<HttpClient>(new HttpClient(new HttpServiceClientHandler())))
-                                    .UseContentRoot(rootDir)
-                                    .UseStartup<Startup>()
-                                    .UseApplicationInsights()
-                                    .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
-                                    .UseUrls(url)
-                                    .Build();
+                            return new WebHostBuilder().UseKestrel()
+                                        .ConfigureServices(
+                                            services => services
+                                                .AddSingleton<StatelessServiceContext>(serviceContext)
+                                                .AddSingleton<HttpClient>(new HttpClient(new HttpServiceClientHandler())))
+                                        .UseContentRoot(rootDir)
+                                        .UseStartup<Startup>()
+                                        .UseApplicationInsights()
+                                        .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
+                                        .UseUrls(url)
+                                        .Build();
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine("Web HostBuilder exception: {0}", ex);
+                            throw;
+                        }
                     }))
             };
         }
