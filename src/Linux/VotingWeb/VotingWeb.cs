@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
+using System.Reflection;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,13 +36,14 @@ namespace VotingWeb
                     new KestrelCommunicationListener(serviceContext, "ServiceEndpoint", (url, listener) =>
                     {
                         //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting WebListener on {url}");
+                        string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
                         return new WebHostBuilder().UseKestrel()
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<StatelessServiceContext>(serviceContext)
                                             .AddSingleton<HttpClient>(new HttpClient(new HttpServiceClientHandler())))
-                                    .UseContentRoot(Directory.GetCurrentDirectory())
+                                    .UseContentRoot(rootDir)
                                     .UseStartup<Startup>()
                                     .UseApplicationInsights()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)

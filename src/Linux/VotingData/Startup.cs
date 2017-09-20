@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.IO;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,10 +15,14 @@ namespace VotingData
     {
         public Startup(IHostingEnvironment env)
         {
+            string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string appsettingsFileFullPath = Path.Combine(rootDir, "appsettings.json");
+            string appsettingsEnvFileFullPath = Path.Combine(rootDir, $"appsettings.{env.EnvironmentName}.json");
+
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile(appsettingsFileFullPath, optional: false, reloadOnChange: true)
+                .AddJsonFile(appsettingsEnvFileFullPath, optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
         }
