@@ -11,7 +11,6 @@
     <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.0.167-preview" />
     <PackageReference Include="Microsoft.ServiceFabric.Data" Version="3.0.167-preview" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.167-preview" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="3.0.167-preview" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.0" />
   </ItemGroup>

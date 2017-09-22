@@ -30,9 +30,9 @@
     </Service>
      -->
     <Service Name="VotingData" ServicePackageActivationMode="ExclusiveProcess">
-      <StatelessService ServiceTypeName="VotingDataType">
+      <StatefulService ServiceTypeName="VotingDataType">
         <UniformInt64Partition PartitionCount="[VotingData_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
-      </StatelessService>
+      </StatefulService>
     </Service>
     <Service Name="VotingWeb" ServicePackageActivationMode="ExclusiveProcess">
       <StatelessService ServiceTypeName="VotingWebType" InstanceCount="[VotingWeb_InstanceCount]">

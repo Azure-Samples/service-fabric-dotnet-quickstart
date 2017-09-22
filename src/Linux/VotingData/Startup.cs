@@ -12,52 +12,41 @@ using Microsoft.Extensions.Logging;
 
 namespace VotingData
 {
-    public class Startup
+public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            try
-            {
-                Console.WriteLine("Entering Startup");
-                string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                string appsettingsFileFullPath = Path.Combine(rootDir, "appsettings.json");
-                string appsettingsEnvFileFullPath = Path.Combine(rootDir, $"appsettings.{env.EnvironmentName}.json");
-
-                var builder = new ConfigurationBuilder()
-                    .SetBasePath(env.ContentRootPath)
-                    .AddJsonFile(appsettingsFileFullPath, optional: false, reloadOnChange: true)
-                    .AddJsonFile(appsettingsEnvFileFullPath, optional: true)
-                    .AddEnvironmentVariables();
-                Configuration = builder.Build();
-                Console.WriteLine("Completed Startup");
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("Startup failed with Exception: {0}", e);
-                throw;
-            }
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Console.WriteLine("Entering ConfigureServices");
-            // Add framework services.
             services.AddMvc();
-            Console.WriteLine("Completed ConfigureServices");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            Console.WriteLine("Entering Configure");
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
 
-            app.UseMvc();
-            Console.WriteLine("Completed Configure");
+            app.UseStaticFiles();
+
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }

@@ -6,7 +6,10 @@ using System.Reflection;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -18,48 +21,49 @@ namespace VotingData
     /// <summary>
     /// The FabricRuntime creates an instance of this class for each service type instance. 
     /// </summary>
-    internal sealed class VotingData : StatelessService
+    internal sealed class VotingData : StatefulService
     {
-        public VotingData(StatelessServiceContext context)
+        public VotingData(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+             Console.WriteLine("Stateful constructor.");
+         }
 
         /// <summary>
         /// Optional override to create listeners (like tcp, http) for this service instance.
         /// </summary>
         /// <returns>The collection of listeners.</returns>
-        protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+        protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceInstanceListener[]
+            return new ServiceReplicaListener[]
             {
-                new ServiceInstanceListener(serviceContext =>
+                new ServiceReplicaListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, (url, listener) =>
                     {
                         try
                         {
-                            Console.WriteLine("building WebHostBuilder");
-                            //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
-                            string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-                            return new WebHostBuilder()
-                                        .UseKestrel()
-                                        .ConfigureServices(
-                                            services => services
-                                                .AddSingleton<StatelessServiceContext>(serviceContext)
-                                                .AddSingleton<IReliableStateManager>(new Mocks.MockReliableStateManager()))
-                                        .UseContentRoot(rootDir)
-                                        .UseStartup<Startup>()
-                                        .UseApplicationInsights()
+                            Console.WriteLine("Starting Kestrel on {0}", url);
+
+                            return WebHost
+                                .CreateDefaultBuilder()
+                                .ConfigureServices(
+                                    services => services
+                                        .AddSingleton<StatefulServiceContext>(serviceContext)
+                                                .AddSingleton<IReliableStateManager>(this.StateManager))
                                         .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
-                                        .UseUrls(url)
-                                        .Build();
+                                .UseStartup<Startup>()
+                                .UseUrls(url)
+                                .Build();
+
                         }
                         catch(Exception ex)
                         {
                             Console.WriteLine("Web HostBuilder exception: {0}", ex);
                             throw;
                         }
-                    }))
+                    }
+                    ))
             };
         }
     }

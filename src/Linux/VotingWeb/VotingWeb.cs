@@ -47,6 +47,7 @@ namespace VotingWeb
                                         .AddSingleton<StatelessServiceContext>(serviceContext)
                                         .AddSingleton<HttpClient>(new HttpClient(new HttpServiceClientHandler())))
                                 .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
+                                .UseStartup<Startup>()
                                 .UseUrls(url)
                                 .Build();
                         }
