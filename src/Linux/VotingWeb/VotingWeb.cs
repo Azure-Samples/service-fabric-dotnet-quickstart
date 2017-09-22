@@ -6,7 +6,10 @@ using System.Reflection;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -37,21 +40,15 @@ namespace VotingWeb
                     {
                         try
                         {
-                            Console.WriteLine("building WebHostBuilder");
-                            //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting WebListener on {url}");
-                            string rootDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-
-                            return new WebHostBuilder().UseKestrel()
-                                        .ConfigureServices(
-                                            services => services
-                                                .AddSingleton<StatelessServiceContext>(serviceContext)
-                                                .AddSingleton<HttpClient>(new HttpClient(new HttpServiceClientHandler())))
-                                        .UseContentRoot(rootDir)
-                                        .UseStartup<Startup>()
-                                        .UseApplicationInsights()
-                                        .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
-                                        .UseUrls(url)
-                                        .Build();
+                            return WebHost
+                                .CreateDefaultBuilder()
+                                .ConfigureServices(
+                                    services => services
+                                        .AddSingleton<StatelessServiceContext>(serviceContext)
+                                        .AddSingleton<HttpClient>(new HttpClient(new HttpServiceClientHandler())))
+                                .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
+                                .UseUrls(url)
+                                .Build();
                         }
                         catch(Exception ex)
                         {
