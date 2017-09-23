@@ -15,6 +15,7 @@
     <EntryPoint>
       <ExeHost>
         <Program>entryPoint.sh</Program>
+        <WorkingFolder>CodePackage</WorkingFolder>
       </ExeHost>
     </EntryPoint>
   </CodePackage>
