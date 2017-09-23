@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
@@ -50,8 +50,8 @@ namespace VotingData
                                 .ConfigureServices(
                                     services => services
                                         .AddSingleton<StatefulServiceContext>(serviceContext)
-                                                .AddSingleton<IReliableStateManager>(this.StateManager))
-                                        .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
+                                        .AddSingleton<IReliableStateManager>(this.StateManager))
+                                .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
                                 .UseStartup<Startup>()
                                 .UseUrls(url)
                                 .Build();
@@ -62,8 +62,7 @@ namespace VotingData
                             Console.WriteLine("Web HostBuilder exception: {0}", ex);
                             throw;
                         }
-                    }
-                    ))
+                    }))
             };
         }
     }
