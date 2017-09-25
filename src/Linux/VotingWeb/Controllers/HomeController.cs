@@ -10,6 +10,7 @@ namespace VotingWeb.Controllers
     {
         public IActionResult Index()
         {
+            ViewData["os"] = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
             return View();
         }
 
