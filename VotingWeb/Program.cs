@@ -1,11 +1,15 @@
-﻿using Microsoft.ServiceFabric.Services.Runtime;
-using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// ------------------------------------------------------------
+//  Copyright (c) Microsoft Corporation.  All rights reserved.
+//  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
+// ------------------------------------------------------------
 
 namespace VotingWeb
 {
+    using System;
+    using System.Diagnostics;
+    using System.Threading;
+    using Microsoft.ServiceFabric.Services.Runtime;
+
     internal static class Program
     {
         /// <summary>
@@ -20,7 +24,8 @@ namespace VotingWeb
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                ServiceRuntime.RegisterServiceAsync("VotingWebType",
+                ServiceRuntime.RegisterServiceAsync(
+                    "VotingWebType",
                     context => new VotingWeb(context)).GetAwaiter().GetResult();
 
                 ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(VotingWeb).Name);

@@ -25,7 +25,7 @@
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <Service Name="VotingData">
       <StatefulService ServiceTypeName="VotingDataType" TargetReplicaSetSize="[VotingData_TargetReplicaSetSize]" MinReplicaSetSize="[VotingData_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[VotingData_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+        <UniformInt64Partition PartitionCount="[VotingData_PartitionCount]" LowKey="0" HighKey="25" />
       </StatefulService>
     </Service>
     <Service Name="VotingWeb" ServicePackageActivationMode="ExclusiveProcess">
