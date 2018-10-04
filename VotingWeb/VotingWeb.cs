@@ -61,10 +61,10 @@ namespace VotingWeb
         }
 
         /// <summary>
-        /// Constructs a service name for a specific poll.
-        /// Example: fabric:/VotingApplication/polls/name-of-poll
+        /// Constructs a service name for the voting data service.
+        /// Example: fabric:/Voting
         /// </summary>
-        /// <param name="poll"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
         internal static Uri GetVotingDataServiceName(ServiceContext context)
         {
