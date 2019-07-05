@@ -1,7 +1,9 @@
 ---
-services: service-fabric
-platforms: dotnet
-author: mikkelhegn
+languages:
+- csharp
+products:
+- azure
+topic: sample
 ---
 
 # Service Fabric .NET Quickstart
