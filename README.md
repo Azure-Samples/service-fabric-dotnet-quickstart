@@ -3,7 +3,7 @@ languages:
 - csharp
 products:
 - azure
-topic: sample
+page_type: sample
 description: "The quickstart contains an application with multiple services demonstrating the concepts of service communication and use of reliable dictionaries."
 ---
 
