@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterName": {
+            "value": "GEN-UNIQUE"
+        },
+        "applicationTypeName": {
+            "value": "VotingType"
+        },
+        "applicationTypeVersion": {
+            "value": "1.0.0"
+        },
+        "appPackageUrl": {
+            "value": "https://servicefabricapps.blob.core.windows.net/apps/Voting.sfpkg"
+        },
+        "applicationName": {
+            "value":"Voting"
+        },
+        "serviceName": {
+            "value": "Voting~VotingWeb"
+        },
+        "serviceTypeName": {
+            "value": "VotingWebType"
+        },
+        "serviceName2": {
+            "value": "Voting~VotingData"
+        },
+        "serviceTypeName2": {
+            "value": "VotingDataType"
+        }
+    }
+}
