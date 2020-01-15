@@ -126,7 +126,9 @@ namespace VotingWeb.Controllers
         /// <returns></returns>
         private long GetPartitionKey(string name)
         {
-            return Char.ToUpper(name.First()) - 'A';
+            long partitionKey = Char.ToUpper(name.First()) - 'A';
+
+            return Math.Min(25, Math.Max(0, partitionKey));
         }
     }
 }
