@@ -1,0 +1,57 @@
+# .NET Desktop 
+# Example azure devops build, publish, release (deploy)
+# requires service fabric 'service connection' configuration
+# https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-tutorial-deploy-app-with-cicd-vsts
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/service-fabric-deploy?view=azure-devops
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solutionName: 'Voting'
+  solution: '**/*.sln'
+  sfproj: '**/*.sfproj'
+  buildPlatform: 'x64'
+  buildConfiguration: 'Release'
+  applicationPackagePath: '$(Build.ArtifactStagingDirectory)\$(solutionName)\pkg\$(buildConfiguration)'
+  serviceConnectionName: 'serviceFabricCluster'
+  publishProfilePath: '$(Build.ArtifactStagingDirectory)\$(solutionName)\PublishProfiles\Cloud.xml'
+  timeoutSec: 600
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(sfproj)'
+    msbuildArgs: '/t:Restore /t:Build /t:Package /p:OutputPath=$(Build.ArtifactStagingDirectory)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(build.sourcesdirectory)\$(solutionName)'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\$(solutionName)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'applicationpackage' 
+    publishLocation: 'Container' # Options: container, filePath
+
+- task: ServiceFabricDeploy@1
+  inputs:
+    applicationPackagePath: '$(applicationPackagePath)'
+    serviceConnectionName: '$(serviceConnectionName)'
+    publishProfilePath: '$(publishProfilePath)'
+    overwriteBehavior: 'SameAppTypeAndVersion'
+    compressPackage: true
+    TimeoutSec: '$(timeoutSec)'
