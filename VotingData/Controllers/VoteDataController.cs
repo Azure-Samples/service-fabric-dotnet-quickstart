@@ -3,6 +3,8 @@
 //  Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------
 
+using System;
+
 namespace VotingData.Controllers
 {
     using System.Collections.Generic;
@@ -20,6 +22,14 @@ namespace VotingData.Controllers
         public VoteDataController(IReliableStateManager stateManager)
         {
             this.stateManager = stateManager;
+        }
+
+        private static void log(string s)
+        {
+            // using (var f = System.IO.File.AppendText(("E:\\tmp\\logfk")))
+            // {
+            //     f.WriteLine(s);
+            // }
         }
 
         // GET api/VoteData
@@ -51,6 +61,8 @@ namespace VotingData.Controllers
         [HttpPut("{name}")]
         public async Task<IActionResult> Put(string name)
         {
+            try
+            {
             IReliableDictionary<string, int> votesDictionary = await this.stateManager.GetOrAddAsync<IReliableDictionary<string, int>>("counts");
 
             using (ITransaction tx = this.stateManager.CreateTransaction())
@@ -59,6 +71,13 @@ namespace VotingData.Controllers
                 await tx.CommitAsync();
             }
 
+
+            }
+            catch (Exception e)
+            {
+                log(e.ToString());
+                // e.TargetSite
+            }
             return new OkResult();
         }
 
