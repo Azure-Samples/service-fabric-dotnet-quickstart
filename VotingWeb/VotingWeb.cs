@@ -11,6 +11,7 @@ namespace VotingWeb
     using System.IO;
     using System.Net.Http;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
     using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -45,6 +46,11 @@ namespace VotingWeb
 
                                 return new WebHostBuilder()
                                     .UseKestrel()
+                                    .ConfigureLogging(logging =>
+                                    {
+                                        logging.ClearProviders();
+                                        logging.AddApplicationInsights();
+                                    })
                                     .ConfigureServices(
                                         services => services
                                             .AddSingleton<HttpClient>(new HttpClient())
@@ -52,7 +58,6 @@ namespace VotingWeb
                                             .AddSingleton<StatelessServiceContext>(serviceContext))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
-                                    .UseApplicationInsights()
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
                                     .UseUrls(url)
                                     .Build();
