@@ -8,6 +8,7 @@ namespace VotingData
     using System.Collections.Generic;
     using System.Fabric;
     using System.IO;
+    using libfk;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.ServiceFabric.Data;
@@ -37,6 +38,7 @@ namespace VotingData
                     serviceContext =>
                         new KestrelCommunicationListener(
                             serviceContext,
+                            "ServiceEndpoint",
                             (url, listener) =>
                             {
                                 ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
