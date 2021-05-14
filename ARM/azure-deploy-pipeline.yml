@@ -1,0 +1,46 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+# name of build pipeline VotingDeployArtifact
+
+resources:
+  pipelines:
+    - pipeline: VotingDeployArtifact # name of this pipeline
+      source: VotingCI # name of build pipeline
+      trigger: true
+
+variables:
+  solutionName: Voting
+  environmentName: $(solutionName)Release
+  artifactName: drop
+  TimeoutSec: 600
+  System.Debug: true
+  serviceConnectionName: serviceFabricCluster
+  artifactsPipeline: VotingCI
+  artifactsReleasePipeline: VotingDeployArtifact
+  buildConfiguration: Release
+
+pool:
+  #name: selfhosted
+  #name: Azure Pipelines
+  vmImage: windows-latest
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      source: specific
+      project: $(artifactsPipeline)
+      runVersion: latest
+      pipeline: $(artifactsPipeline)
+      targetPath: $(Pipeline.Workspace)
+
+  - task: ServiceFabricDeploy@1
+    inputs:
+      applicationPackagePath: $(Pipeline.Workspace)/$(solutionName)/pkg/$(buildConfiguration)
+      serviceConnectionName: $(serviceConnectionName)
+      publishProfilePath: $(Pipeline.Workspace)/$(solutionName)/PublishProfiles/Cloud.xml
+      overwriteBehavior: SameAppTypeAndVersion
+      compressPackage: true
+      TimeoutSec: $(timeoutSec)
