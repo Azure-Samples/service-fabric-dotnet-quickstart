@@ -20,7 +20,7 @@ variables:
   artifactName: drop
   System.Debug: true
 
-  pool:
+pool:
   #name: selfhosted
   #name: Azure Pipelines
   vmImage: windows-latest
