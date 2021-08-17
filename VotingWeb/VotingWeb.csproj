@@ -13,11 +13,11 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.8" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="7.1.458" />
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="4.1.458" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="4.1.458" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.1.458" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="4.1.458" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="8.1.321" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="5.1.321" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="5.1.321" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="5.1.321" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services.Remoting" Version="5.1.321" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
