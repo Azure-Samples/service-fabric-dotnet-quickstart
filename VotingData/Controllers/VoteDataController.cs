@@ -13,38 +13,27 @@ namespace VotingData.Controllers
     using Microsoft.ServiceFabric.Data.Collections;
 
     [Route("api/[controller]")]
-    public class VoteDataController : Controller
+    public class VoteDataController(IReliableStateManager stateManager) : Controller
     {
-        private readonly IReliableStateManager stateManager;
-
-        public VoteDataController(IReliableStateManager stateManager)
-        {
-            this.stateManager = stateManager;
-        }
+        private readonly IReliableStateManager stateManager = stateManager;
 
         // GET api/VoteData
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            CancellationToken ct = new CancellationToken();
-
+            CancellationToken ct = new();
             IReliableDictionary<string, int> votesDictionary = await this.stateManager.GetOrAddAsync<IReliableDictionary<string, int>>("counts");
+            using ITransaction tx = this.stateManager.CreateTransaction();
+            var list = await votesDictionary.CreateEnumerableAsync(tx);
+            var enumerator = list.GetAsyncEnumerator();
+            List<KeyValuePair<string, int>> result = [];
 
-            using (ITransaction tx = this.stateManager.CreateTransaction())
+            while (await enumerator.MoveNextAsync(ct))
             {
-                var list = await votesDictionary.CreateEnumerableAsync(tx);
-
-                var enumerator = list.GetAsyncEnumerator();
-
-                List<KeyValuePair<string, int>> result = new List<KeyValuePair<string, int>>();
-
-                while (await enumerator.MoveNextAsync(ct))
-                {
-                    result.Add(enumerator.Current);
-                }
-
-                return this.Json(result);
+                result.Add(enumerator.Current);
             }
+
+            return this.Json(result);
         }
 
         // PUT api/VoteData/name
@@ -67,19 +56,18 @@ namespace VotingData.Controllers
         public async Task<IActionResult> Delete(string name)
         {
             IReliableDictionary<string, int> votesDictionary = await this.stateManager.GetOrAddAsync<IReliableDictionary<string, int>>("counts");
-
-            using (ITransaction tx = this.stateManager.CreateTransaction())
+            using ITransaction tx = this.stateManager.CreateTransaction();
+            
+            if (await votesDictionary.ContainsKeyAsync(tx, name))
             {
-                if (await votesDictionary.ContainsKeyAsync(tx, name))
-                {
-                    await votesDictionary.TryRemoveAsync(tx, name);
-                    await tx.CommitAsync();
-                    return new OkResult();
-                }
-                else
-                {
-                    return new NotFoundResult();
-                }
+                await votesDictionary.TryRemoveAsync(tx, name);
+                await tx.CommitAsync();
+
+                return new OkResult();
+            }
+            else
+            {
+                return new NotFoundResult();
             }
         }
     }

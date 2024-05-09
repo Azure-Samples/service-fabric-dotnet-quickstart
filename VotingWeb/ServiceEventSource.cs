@@ -13,7 +13,7 @@ namespace VotingWeb
     [EventSource(Name = "MyCompany-Voting-VotingWeb")]
     internal sealed class ServiceEventSource : EventSource
     {
-        public static readonly ServiceEventSource Current = new ServiceEventSource();
+        public static readonly ServiceEventSource Current = new();
 
         static ServiceEventSource()
         {
@@ -53,10 +53,10 @@ namespace VotingWeb
         [NonEvent]
         public void Message(string message, params object[] args)
         {
-            if (this.IsEnabled())
+            if (IsEnabled())
             {
                 string finalMessage = string.Format(message, args);
-                this.Message(finalMessage);
+                Message(finalMessage);
             }
         }
 
@@ -65,19 +65,19 @@ namespace VotingWeb
         [Event(MessageEventId, Level = EventLevel.Informational, Message = "{0}")]
         public void Message(string message)
         {
-            if (this.IsEnabled())
+            if (IsEnabled())
             {
-                this.WriteEvent(MessageEventId, message);
+                WriteEvent(MessageEventId, message);
             }
         }
 
         [NonEvent]
         public void ServiceMessage(ServiceContext serviceContext, string message, params object[] args)
         {
-            if (this.IsEnabled())
+            if (IsEnabled())
             {
                 string finalMessage = string.Format(message, args);
-                this.ServiceMessage(
+                ServiceMessage(
                     serviceContext.ServiceName.ToString(),
                     serviceContext.ServiceTypeName,
                     GetReplicaOrInstanceId(serviceContext),
@@ -110,7 +110,7 @@ namespace VotingWeb
                 string message)
         {
 #if !UNSAFE
-            this.WriteEvent(
+            WriteEvent(
                 ServiceMessageEventId,
                 serviceName,
                 serviceTypeName,
@@ -149,7 +149,7 @@ applicationTypeName, pNodeName = nodeName, pMessage = message)
             Keywords = Keywords.ServiceInitialization)]
         public void ServiceTypeRegistered(int hostProcessId, string serviceType)
         {
-            this.WriteEvent(ServiceTypeRegisteredEventId, hostProcessId, serviceType);
+            WriteEvent(ServiceTypeRegisteredEventId, hostProcessId, serviceType);
         }
 
         private const int ServiceHostInitializationFailedEventId = 4;
@@ -161,7 +161,7 @@ applicationTypeName, pNodeName = nodeName, pMessage = message)
             Keywords = Keywords.ServiceInitialization)]
         public void ServiceHostInitializationFailed(string exception)
         {
-            this.WriteEvent(ServiceHostInitializationFailedEventId, exception);
+            WriteEvent(ServiceHostInitializationFailedEventId, exception);
         }
 
         // A pair of events sharing the same name prefix with a "Start"/"Stop" suffix implicitly marks boundaries of an event tracing activity.
@@ -172,7 +172,7 @@ applicationTypeName, pNodeName = nodeName, pMessage = message)
         [Event(ServiceRequestStartEventId, Level = EventLevel.Informational, Message = "Service request '{0}' started", Keywords = Keywords.Requests)]
         public void ServiceRequestStart(string requestTypeName)
         {
-            this.WriteEvent(ServiceRequestStartEventId, requestTypeName);
+            WriteEvent(ServiceRequestStartEventId, requestTypeName);
         }
 
         private const int ServiceRequestStopEventId = 6;
@@ -180,7 +180,7 @@ applicationTypeName, pNodeName = nodeName, pMessage = message)
         [Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{0}' finished", Keywords = Keywords.Requests)]
         public void ServiceRequestStop(string requestTypeName, string exception = "")
         {
-            this.WriteEvent(ServiceRequestStopEventId, requestTypeName, exception);
+            WriteEvent(ServiceRequestStopEventId, requestTypeName, exception);
         }
 
         #endregion
