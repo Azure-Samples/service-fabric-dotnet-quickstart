@@ -6,7 +6,6 @@
 namespace VotingData
 {
     using System;
-    using System.Diagnostics;
     using System.Threading;
     using Microsoft.ServiceFabric.Services.Runtime;
 
@@ -28,7 +27,7 @@ namespace VotingData
                     "VotingDataType",
                     context => new VotingData(context)).GetAwaiter().GetResult();
 
-                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(VotingData).Name);
+                ServiceEventSource.Current.ServiceTypeRegistered(Environment.ProcessId, typeof(VotingData).Name);
 
                 // Prevents this host process from terminating so services keeps running. 
                 Thread.Sleep(Timeout.Infinite);
