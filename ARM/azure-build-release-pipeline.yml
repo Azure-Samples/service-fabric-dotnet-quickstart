@@ -1,0 +1,99 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+# name of build pipeline VotingCICD
+
+resources:
+  pipelines:
+    - pipeline: VotingCICD # name of this pipeline
+      source: VotingCI # name of build pipeline
+      trigger: true
+
+variables:
+  solutionName: Voting
+  solution: "**/*.sln"
+  sfproj: "**/*.sfproj"
+  buildPlatform: x64
+  buildConfiguration: Release
+  serviceConnectionName: serviceFabricCluster
+  artifactName: drop
+  System.Debug: true
+  environmentName: $(solutionName)Release
+  TimeoutSec: 600
+  artifactsPipeline: VotingCI
+  artifactsReleasePipeline: VotingCICD
+
+pool:
+  #name: selfhosted
+  #name: Azure Pipelines
+  vmImage: windows-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        displayName: Build Project
+        steps:
+          - task: NuGetToolInstaller@1
+
+          - task: NuGetCommand@2
+            inputs:
+              restoreSolution: $(solution)
+
+          - task: VSBuild@1
+            inputs:
+              solution: $(sfproj)
+              msbuildArgs: /t:Restore /t:Build /t:Package /p:OutputPath=$(Build.ArtifactStagingDirectory)
+              platform: $(buildPlatform)
+              configuration: $(buildConfiguration)
+
+          - task: CopyFiles@2
+            displayName: Copy '$(solutionName)' Application Parameters
+            inputs:
+              SourceFolder: $(build.sourcesdirectory)/$(solutionName)/ApplicationParameters
+              Contents: "**"
+              TargetFolder: $(Build.ArtifactStagingDirectory)/$(solutionName)/ApplicationParameters
+
+          - task: CopyFiles@2
+            displayName: Copy '$(solutionName)' Publish Profiles
+            inputs:
+              SourceFolder: $(build.sourcesdirectory)/$(solutionName)/PublishProfiles
+              Contents: "**"
+              TargetFolder: $(Build.ArtifactStagingDirectory)/$(solutionName)/PublishProfiles
+
+          - task: CopyFiles@2
+            displayName: Copy '$(solutionName)' packages
+            inputs:
+              SourceFolder: $(build.sourcesdirectory)/$(solutionName)/pkg/$(buildConfiguration)
+              Contents: "**"
+              TargetFolder: $(Build.ArtifactStagingDirectory)/$(solutionName)/pkg/$(buildConfiguration)
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish Build Artifacts
+            inputs:
+              pathToPublish: $(Build.ArtifactStagingDirectory)
+              artifactName: $(artifactName)
+              publishLocation: container
+
+  - stage: Deploy
+    dependsOn: Build
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy Application
+        #condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
+        environment: $(environmentName)
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: ServiceFabricDeploy@1
+                  displayName: Deploy Service Fabric Application
+                  inputs:
+                    applicationPackagePath: $(Pipeline.Workspace)/$(artifactsReleasePipeline)/$(artifactName)/$(solutionName)/pkg/$(buildConfiguration)
+                    serviceConnectionName: $(serviceConnectionName)
+                    publishProfilePath: $(Pipeline.Workspace)/$(artifactsReleasePipeline)/$(artifactName)/$(solutionName)/PublishProfiles/Cloud.xml
+                    overwriteBehavior: SameAppTypeAndVersion
+                    compressPackage: true
+                    TimeoutSec: $(timeoutSec)
